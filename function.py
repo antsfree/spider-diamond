@@ -2,6 +2,7 @@ from urllib import request
 import base64
 from zlib import decompress
 
+
 def request_html(page_url):
     with request.urlopen(page_url) as f:
         data = f.read()
