@@ -21,13 +21,11 @@ def condition():
     elements = soup.find('div', {'id': 'searchBgMore'}).children
     attr_map = []
     text = ''
+    # 过滤空行
+    elements = filter(filter_line_break, elements)
     for element in elements:
-        if element == "\n":
-            continue
-        for child in element.children:
-            # 判断不为空行
-            if child == "\n":
-                continue
+        children = filter(filter_line_break, element.children)
+        for child in children:
             try:
                 if child['class'][0]:
                     class_name = child['class'][0]
@@ -58,6 +56,11 @@ def condition():
                 continue
 
     return attr_map
+
+
+def filter_line_break(data):
+    if data != "\n":
+        return data
 
 
 def store_condition_data(data, file):
