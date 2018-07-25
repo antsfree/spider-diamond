@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment
 import re
 from function import request_html
 import os
@@ -17,6 +17,9 @@ def condition():
     """
     html = request_html(url_diamond)
     soup = BeautifulSoup(html, 'html.parser')
+    # 过滤注释代码
+    comments = soup.findAll(text=lambda text: isinstance(text, Comment))
+    [comment.extract() for comment in comments]
     # list
     elements = soup.find('div', {'id': 'searchBgMore'}).children
     attr_map = []
@@ -47,18 +50,21 @@ def condition():
                             # 提取各自标签的 title 属性
                             try:
                                 li_title = li_attributes['title']
-                            except Exception as e:
+                            except Exception:
                                 li_title = li_attributes['key2']
                             value.append({'title': li_title, 'value': li_attributes['key2']})
-
                         attr_map.append({'name': text, 'mark': key, 'values': value})
-            except Exception as e:
+            except Exception:
                 continue
-
     return attr_map
 
 
 def filter_line_break(data):
+    """
+    过滤换行符
+    :param data:
+    :return:
+    """
     if data != "\n":
         return data
 
