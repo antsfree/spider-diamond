@@ -1,6 +1,7 @@
 from urllib import request
 import base64
 from zlib import decompress
+import os
 
 
 def request_html(page_url):
@@ -23,3 +24,17 @@ def request_api(api_url):
 def get_request_info(request_url):
     with request.urlopen(request_url) as f:
         return f.info()
+
+
+def read_file(file_path):
+    """
+    文件读取
+    :param file_path:
+    :return:
+    """
+    if not os.path.isfile(file_path):
+        return 'error file path'
+    with open(file_path, 'r', encoding='utf-8') as f:
+        f.seek(0)
+        res = f.read()
+        return res
