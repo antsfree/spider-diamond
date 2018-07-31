@@ -6,8 +6,8 @@ from function import request_html
 import os
 from json import dumps
 
-url_diamond = "http://www.zbird.com/diamond/"
-condition_file = "./data/condition.json"
+DIAMOND_URL = "http://www.zbird.com/diamond/"
+CONDITION_FILE = "./data/condition.json"
 
 
 def condition():
@@ -15,7 +15,7 @@ def condition():
     获取钻石查询参数及对应值
     :return:
     """
-    html = request_html(url_diamond)
+    html = request_html(DIAMOND_URL)
     soup = BeautifulSoup(html, 'html.parser')
     # 过滤注释代码
     comments = soup.findAll(text=lambda text: isinstance(text, Comment))
@@ -95,8 +95,8 @@ def main():
     attr_map = condition()
     print(attr_map)
     # 写文件操作
-    store_condition_data(attr_map, condition_file)
-    if os.path.exists(condition_file):
+    store_condition_data(attr_map, CONDITION_FILE)
+    if os.path.exists(CONDITION_FILE):
         print('Successful access to conditions !')
 
 
