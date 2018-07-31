@@ -2,28 +2,50 @@ import function
 import json
 import pymysql
 
-url_example = "http://www.zbird.com/apidiamond/ajaxdiamondNative/cert_state/ags/symmetryName/Ideal,EX/fluorescence/None,Faint/clearityName/FL,IF/polishName/Ideal,EX/cutName/Ideal,EX/locationName/undefined/salePrice/1000-10000/shapeId/003,001/colorName/D/priStoneWeight/0.3-9.87/pnum/1/isgn/1/groupby/2/psize/8/promot/undefined/fifteen/0"
+BASE_API_URL = 'http://www.zbird.com/apidiamond/ajaxdiamondNative/'
+# 单页显示条数
+PAGE_SIZE = '20'
+# 全球搜索
+GLOBAL_SEARCH = '2'
+# 国内搜索
+DOMESTIC_SEARCH = '1'
+# 搜索范围
+SEARCH_AREA = DOMESTIC_SEARCH
+# 默认搜索条件
+DEFAULT_SEARCH_CONDITION = '/priStoneWeight/0.3-10000/'
 
-url_example1 = "http://www.zbird.com/apidiamond/ajaxdiamondNative/pnum/1/isgn/2/groupby/2/psize/8/promot/undefined/fifteen/0"
 
-# 连接数据库
-connect = pymysql.Connect(
-    host='127.0.0.1',
-    port=3306,
-    user='root',
-    password='',
-    db='diamond',
-    charset='utf8'
-)
-res = function.request_api(url_example1)
-res = json.loads(res)
-page = res['pagenav']['lastpage']
-for i in range(1, page + 1):
-    url_example = "http://www.zbird.com/apidiamond/ajaxdiamondNative/pnum/" + str(
-        i) + "/isgn/5/groupby/0/psize/20/promot/undefined/fifteen/0"
-    res = function.request_api(url_example)
-    res = json.loads(res)
-    sql = "INSERT INTO diamonds (id,shape_id,shape_name,strone_weight,clearity,color,cut,polish,symmetry,fluorescence,bar_code,certificate,certificate_code,sale_price,slide_price,market_price,discount,sale_status,stock_status,location,location_chinese_name,diamond_params,img_info) VALUES "
+def get_page_num(search_mode):
+    """
+    获取页码
+    :param search_mode:
+    :return:
+    """
+    url = BASE_API_URL + DEFAULT_SEARCH_CONDITION + "isgn/" + str(search_mode)
+    result = function.request_api(url)
+    result = json.loads(result)
+    page_num = result['pagenav']['lastpage']
+    return page_num + 1
+
+
+def save_diamonds(res):
+    """
+    数据存储
+    :param res:
+    :return:
+    """
+    if res is None:
+        return False
+    # 连接数据库
+    connect = pymysql.Connect(
+        host='127.0.0.1',
+        port=3306,
+        user='root',
+        password='',
+        db='diamond',
+        charset='utf8'
+    )
+    sql = "INSERT INTO new_diamonds (id,shape_id,shape_name,strone_weight,clearity,color,cut,polish,symmetry,fluorescence,bar_code,certificate,certificate_code,sale_price,slide_price,market_price,discount,sale_status,stock_status,location,location_chinese_name,diamond_params,img_info) VALUES "
     sql_value = ""
     sql_data = []
     for row in res['rows']:
@@ -59,4 +81,31 @@ for i in range(1, page + 1):
     try:
         cursor.execute(sql)
     except Exception:
-        continue
+        return False
+
+
+def get_diamonds(search_mode):
+    """
+    获取钻石数据
+    :param search_mode:
+    :return:
+    """
+    page = get_page_num("1")
+    for i in range(1, page + 1):
+        url_example = BASE_API_URL + \
+                      DEFAULT_SEARCH_CONDITION + \
+                      "/pnum/" + str(i) + \
+                      "/isgn/" + search_mode + \
+                      "/psize/" + PAGE_SIZE
+        res = function.request_api(url_example)
+        res = json.loads(res)
+        save_diamonds(res)
+
+
+def main():
+    get_diamonds(GLOBAL_SEARCH)
+    get_diamonds(DOMESTIC_SEARCH)
+
+
+if __name__ == '__main__':
+    main()
