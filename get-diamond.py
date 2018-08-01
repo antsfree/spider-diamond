@@ -45,7 +45,7 @@ def save_diamonds(res):
         db='diamond',
         charset='utf8'
     )
-    sql = "INSERT INTO new_diamonds (id,shape_id,shape_name,strone_weight,clearity,color,cut,polish,symmetry,fluorescence,bar_code,certificate,certificate_code,sale_price,slide_price,market_price,discount,sale_status,stock_status,location,location_chinese_name,diamond_params,img_info) VALUES "
+    sql = "INSERT INTO diamonds (id,shape_id,shape_name,strone_weight,clearity,color,cut,polish,symmetry,fluorescence,bar_code,certificate,certificate_code,sale_price,slide_price,market_price,discount,sale_status,stock_status,location,location_chinese_name,diamond_params,img_info) VALUES "
     sql_value = ""
     sql_data = []
     for row in res['rows']:
@@ -108,9 +108,8 @@ def get_diamonds(search_mode, page_num=None):
 
 
 def main():
-    get_diamonds(DOMESTIC_SEARCH, 142)
+    get_diamonds(DOMESTIC_SEARCH)
     get_diamonds(GLOBAL_SEARCH)
-
 
 
 if __name__ == '__main__':
