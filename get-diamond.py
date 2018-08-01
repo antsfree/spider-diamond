@@ -12,7 +12,7 @@ DOMESTIC_SEARCH = '1'
 # 搜索范围
 SEARCH_AREA = DOMESTIC_SEARCH
 # 默认搜索条件
-DEFAULT_SEARCH_CONDITION = '/priStoneWeight/0.3-10000/'
+DEFAULT_SEARCH_CONDITION = 'priStoneWeight/0.3-10000/'
 
 
 def get_page_num(search_mode):
@@ -49,7 +49,6 @@ def save_diamonds(res):
     sql_value = ""
     sql_data = []
     for row in res['rows']:
-        print(row)
         sql_value += "("
         sql_data.append('"' + str(row['id']) + '"')
         sql_data.append('"' + str(row['shapeId']).strip() + '"')
@@ -84,27 +83,34 @@ def save_diamonds(res):
         return False
 
 
-def get_diamonds(search_mode):
+def get_diamonds(search_mode, page_num=None):
     """
     获取钻石数据
     :param search_mode:
+    :param page_num:
     :return:
     """
-    page = get_page_num("1")
-    for i in range(1, page + 1):
-        url_example = BASE_API_URL + \
-                      DEFAULT_SEARCH_CONDITION + \
-                      "/pnum/" + str(i) + \
-                      "/isgn/" + search_mode + \
-                      "/psize/" + PAGE_SIZE
-        res = function.request_api(url_example)
+    page = get_page_num(search_mode)
+    if page_num is None:
+        page_num = 1
+    for i in range(page_num, page):
+        diamonds_api = BASE_API_URL + \
+                       DEFAULT_SEARCH_CONDITION + \
+                       "pnum/" + str(i) + \
+                       "/isgn/" + str(search_mode)
+        res = function.request_api(diamonds_api)
         res = json.loads(res)
+        print("当前正在获取搜索模式为 " + str(search_mode) + " 的第 " + str(i) + " 页数据\n")
         save_diamonds(res)
+        if i == (page - 1):
+            print(diamonds_api)
+            print("\n")
 
 
 def main():
+    get_diamonds(DOMESTIC_SEARCH, 142)
     get_diamonds(GLOBAL_SEARCH)
-    get_diamonds(DOMESTIC_SEARCH)
+
 
 
 if __name__ == '__main__':
