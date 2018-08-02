@@ -23,6 +23,7 @@
 # Dump of table diamonds
 # ------------------------------------------------------------
 
+# 钻石数据主表
 DROP TABLE IF EXISTS `diamonds`;
 
 CREATE TABLE `diamonds` (
@@ -49,11 +50,43 @@ CREATE TABLE `diamonds` (
   `location_chinese_name` varchar(20) DEFAULT NULL COMMENT '所在地名称',
   `diamond_params` text COMMENT '钻石参数',
   `img_info` text COMMENT '图片信息',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `shape_id` (`shape_id`),
+  KEY `clearity` (`clearity`),
+  KEY `color` (`color`),
+  KEY `cut` (`cut`),
+  KEY `polish` (`polish`),
+  KEY `symmetry` (`symmetry`),
+  KEY `fluorescence` (`fluorescence`),
+  KEY `certificate` (`certificate`),
+  KEY `certificate_code` (`certificate_code`),
+  KEY `location` (`location`),
+  KEY `stock_status` (`stock_status`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
+# 搜索条件分类表
+DROP TABLE IF EXISTS `diamond_conditions`;
 
+CREATE TABLE `diamond_conditions` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL COMMENT '名称',
+  `mark` varchar(20) DEFAULT NULL COMMENT '标识',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+# 搜索条件数据表
+DROP TABLE IF EXISTS `diamond_condition_values`;
+
+CREATE TABLE `diamond_condition_values` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `condition_id` int(11) DEFAULT '0' COMMENT '条件关联 ID',
+  `title` varchar(20) DEFAULT '0' COMMENT '标题',
+  `value` varchar(20) DEFAULT '' COMMENT '条件值',
+  PRIMARY KEY (`id`),
+  KEY `condition_id` (`condition_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
