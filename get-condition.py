@@ -5,6 +5,7 @@ import re
 from function import request_html
 import os
 from json import dumps
+import pymysql
 
 url_diamond = "http://www.zbird.com/diamond/"
 condition_file = "./data/condition.json"
@@ -91,9 +92,49 @@ def store_condition_data(data, file):
         return res
 
 
+def store_data(data):
+    """
+    写入数据库
+    :param data:
+    :return:
+    """
+    connect = pymysql.Connect(
+        host='127.0.0.1',
+        port=3306,
+        user='root',
+        password='',
+        db='diamond',
+        charset='utf8'
+    )
+    cursor = connect.cursor()
+    for v in data:
+        c_str = "INSERT INTO diamond_conditions (`name`, `mark`) VALUES ('" + v['name'] + "','" + v['mark'] + "')"
+        try:
+            cursor.execute(c_str)
+            id = connect.insert_id()
+        except Exception:
+            id = None
+        if id is None:
+            print('Insert Failed : ' + c_str)
+            exit()
+        v_str = "INSERT INTO diamond_condition_values (`condition_id`, `title`, `value`) VALUES "
+        v_sql = ""
+        for value in v['values']:
+            v_sql += "('" + str(id) + "','" + value['title'] + "','" + value['value'] + "'),"
+        v_str += v_sql[:-1]
+        try:
+            cursor.execute(v_str)
+            # 提交
+            connect.commit()
+        except Exception:
+            # 提交回滚
+            connect.rollback()
+
+
 def main():
     attr_map = condition()
-    print(attr_map)
+    # 写数据库
+    store_data(attr_map)
     # 写文件操作
     store_condition_data(attr_map, condition_file)
     if os.path.exists(condition_file):
