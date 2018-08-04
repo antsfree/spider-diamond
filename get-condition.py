@@ -6,9 +6,7 @@ from function import request_html
 import os
 from json import dumps
 import pymysql
-
-url_diamond = "http://www.zbird.com/diamond/"
-condition_file = "./data/condition.json"
+from config import *
 
 
 def condition():
@@ -16,7 +14,7 @@ def condition():
     获取钻石查询参数及对应值
     :return:
     """
-    html = request_html(url_diamond)
+    html = request_html(DIAMOND_URL)
     soup = BeautifulSoup(html, 'html.parser')
     # 过滤注释代码
     comments = soup.findAll(text=lambda text: isinstance(text, Comment))
@@ -99,12 +97,12 @@ def store_data(data):
     :return:
     """
     connect = pymysql.Connect(
-        host='127.0.0.1',
-        port=3306,
-        user='root',
-        password='',
-        db='diamond',
-        charset='utf8'
+        host=DB_HOST,
+        port=DB_PORT,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        db=DB_DATABASE,
+        charset=DB_CHARSET
     )
     cursor = connect.cursor()
     for v in data:
@@ -136,8 +134,8 @@ def main():
     # 写数据库
     store_data(attr_map)
     # 写文件操作
-    store_condition_data(attr_map, condition_file)
-    if os.path.exists(condition_file):
+    store_condition_data(attr_map, CONDITION_FILE_DIR)
+    if os.path.exists(CONDITION_FILE_DIR):
         print('Successful access to conditions !')
 
 
