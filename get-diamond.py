@@ -1,18 +1,7 @@
 import function
 import json
 import pymysql
-
-BASE_API_URL = 'http://www.zbird.com/apidiamond/ajaxdiamondNative/'
-# 单页显示条数
-PAGE_SIZE = '20'
-# 全球搜索
-GLOBAL_SEARCH = '2'
-# 国内搜索
-DOMESTIC_SEARCH = '1'
-# 搜索范围
-SEARCH_AREA = DOMESTIC_SEARCH
-# 默认搜索条件
-DEFAULT_SEARCH_CONDITION = 'priStoneWeight/0.3-10000/'
+from config import *
 
 
 def get_page_num(search_mode):
@@ -38,12 +27,12 @@ def save_diamonds(res):
         return False
     # 连接数据库
     connect = pymysql.Connect(
-        host='127.0.0.1',
-        port=3306,
-        user='root',
-        password='',
-        db='diamond',
-        charset='utf8'
+        host=DB_HOST,
+        port=DB_PORT,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        db=DB_DATABASE,
+        charset=DB_CHARSET
     )
     sql = "INSERT INTO diamonds (id,shape_id,shape_name,strone_weight,clearity,color,cut,polish,symmetry,fluorescence,bar_code,certificate,certificate_code,sale_price,slide_price,market_price,discount,sale_status,stock_status,location,location_chinese_name,diamond_params,img_info) VALUES "
     sql_value = ""
