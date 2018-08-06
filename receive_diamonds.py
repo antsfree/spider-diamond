@@ -2,6 +2,11 @@ import function
 import json
 import pymysql
 from config import *
+import time
+from multiprocessing import cpu_count, Pool
+
+# 最大进程数
+MAX_PROCESS = cpu_count()
 
 
 def get_page_num(search_mode):
@@ -72,17 +77,15 @@ def save_diamonds(res):
         return False
 
 
-def get_diamonds(search_mode, page_num=None):
+def get_diamonds(search_mode, start_page, end_page):
     """
     获取钻石数据
     :param search_mode:
-    :param page_num:
+    :param start_page:
+    :param end_page:
     :return:
     """
-    page = get_page_num(search_mode)
-    if page_num is None:
-        page_num = 1
-    for i in range(page_num, page):
+    for i in range(start_page, end_page + 1):
         diamonds_api = BASE_API_URL + \
                        DEFAULT_SEARCH_CONDITION + \
                        "pnum/" + str(i) + \
@@ -91,14 +94,46 @@ def get_diamonds(search_mode, page_num=None):
         res = json.loads(res)
         print("当前正在获取搜索模式为 " + str(search_mode) + " 的第 " + str(i) + " 页数据\n")
         save_diamonds(res)
-        if i == (page - 1):
+        if i == end_page:
             print(diamonds_api)
             print("\n")
 
 
+def delivery_num(num):
+    """
+    进程处理数量分配
+    :param num:
+    :return:
+    """
+    while (num % MAX_PROCESS) != 0:
+        num += 1
+    return int(num / MAX_PROCESS)
+
+
+def diamond_process(search_mode):
+    """
+    多进程处理数据
+    :param search_mode:
+    :return:
+    """
+    total_page = get_page_num(search_mode)
+    per_num = delivery_num(total_page)
+    # 开启线程池
+    pool = Pool(cpu_count())
+    for p in range(1, MAX_PROCESS + 1):
+        end = per_num * p
+        start = end - per_num + 1
+        pool.apply_async(get_diamonds, args=(search_mode, start, end))
+    pool.close()
+    pool.join()
+
+
 def main():
-    get_diamonds(DOMESTIC_SEARCH)
-    get_diamonds(GLOBAL_SEARCH)
+    start_time = time.time()
+    diamond_process(DOMESTIC_SEARCH)
+    diamond_process(GLOBAL_SEARCH)
+    end_time = time.time()
+    print(end_time - start_time)
 
 
 if __name__ == '__main__':
