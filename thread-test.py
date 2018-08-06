@@ -1,7 +1,7 @@
 # /usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
-from multiprocessing import Process
+from multiprocessing import cpu_count, Pool
 
 
 def run_process(url):
@@ -9,8 +9,9 @@ def run_process(url):
 
 
 if __name__ == '__main__':
-    p = Process(target=run_process, args=('/api/diamonds',))
-    print('Child Process will start')
-    p.start()
-    p.join()
+    pool = Pool(cpu_count())
+    for i in range(1, cpu_count() + 1):
+        pool.apply_async(run_process, args=(i,))
+    pool.close()
+    pool.join()
     print('end.')
