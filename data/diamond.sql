@@ -29,6 +29,7 @@ DROP TABLE IF EXISTS `diamonds`;
 CREATE TABLE `diamonds` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `shape_id` varchar(5) NOT NULL DEFAULT '' COMMENT '形状 ID',
+  `type` varchar(5) NOT NULL DEFAULT '' COMMENT '状态(现货1、全球钻2)',
   `shape_name` varchar(10) NOT NULL DEFAULT '' COMMENT '形状名称',
   `strone_weight` varchar(10) NOT NULL DEFAULT '' COMMENT '钻石大小',
   `clearity` varchar(5) NOT NULL DEFAULT '' COMMENT '纯净度',
@@ -52,6 +53,7 @@ CREATE TABLE `diamonds` (
   `img_info` text COMMENT '图片信息',
   PRIMARY KEY (`id`),
   KEY `shape_id` (`shape_id`),
+  KEY `type` (`type`),
   KEY `clearity` (`clearity`),
   KEY `color` (`color`),
   KEY `cut` (`cut`),
