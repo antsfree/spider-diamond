@@ -22,10 +22,11 @@ def get_page_num(search_mode):
     return page_num + 1
 
 
-def save_diamonds(res):
+def save_diamonds(res, search_mode):
     """
     数据存储
     :param res:
+    :param search_mode:
     :return:
     """
     if res is None:
@@ -39,13 +40,14 @@ def save_diamonds(res):
         db=DB_DATABASE,
         charset=DB_CHARSET
     )
-    sql = "INSERT INTO diamonds (id,shape_id,shape_name,strone_weight,clearity,color,cut,polish,symmetry,fluorescence,bar_code,certificate,certificate_code,sale_price,slide_price,market_price,discount,sale_status,stock_status,location,location_chinese_name,diamond_params,img_info) VALUES "
+    sql = "INSERT INTO diamonds (id,shape_id,source_type,shape_name,strone_weight,clearity,color,cut,polish,symmetry,fluorescence,bar_code,certificate,certificate_code,sale_price,slide_price,market_price,discount,sale_status,stock_status,location,location_chinese_name,diamond_params,img_info) VALUES "
     sql_value = ""
     sql_data = []
     for row in res['rows']:
         sql_value += "("
         sql_data.append('"' + str(row['id']) + '"')
         sql_data.append('"' + str(row['shapeId']).strip() + '"')
+        sql_data.append('"' + str(search_mode) + '"')
         sql_data.append('"' + str(row['shapeName']).strip() + '"')
         sql_data.append('"' + str(row['priStoneWeight']).strip() + '"')
         sql_data.append('"' + str(row['clearityName']).strip() + '"')
@@ -93,7 +95,7 @@ def get_diamonds(search_mode, start_page, end_page):
         res = function.request_api(diamonds_api)
         res = json.loads(res)
         print("当前正在获取搜索模式为 " + str(search_mode) + " 的第 " + str(i) + " 页数据\n")
-        save_diamonds(res)
+        save_diamonds(res, search_mode)
         if i == end_page:
             print(diamonds_api)
             print("\n")
